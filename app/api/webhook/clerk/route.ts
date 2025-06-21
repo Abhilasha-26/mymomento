@@ -12,6 +12,7 @@ export async function POST(req: Request) {
     throw new Error('Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local');
   }
 
+  // Extract headers
   const headerPayload = headers();
   const svix_id = headerPayload.get("svix-id");
   const svix_timestamp = headerPayload.get("svix-timestamp");
@@ -21,9 +22,11 @@ export async function POST(req: Request) {
     return new Response('Missing svix headers', { status: 400 });
   }
 
+  // Parse body
   const payload = await req.json();
   const body = JSON.stringify(payload);
 
+  // Verify webhook
   const wh = new Webhook(WEBHOOK_SECRET);
   let evt: WebhookEvent;
 
@@ -34,11 +37,13 @@ export async function POST(req: Request) {
       "svix-signature": svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error('Error verifying webhook:', err);
+    console.error('Webhook verification failed:', err, {
+      svix_id,
+      svix_timestamp,
+    });
     return new Response('Webhook verification failed', { status: 400 });
   }
 
-  const { id: userId } = evt.data;
   const eventType = evt.type;
 
   if (eventType === 'user.created') {
@@ -47,7 +52,7 @@ export async function POST(req: Request) {
     const user = {
       clerkId: id,
       email: email_addresses?.[0]?.email_address ?? '',
-      username: username!,
+      username: username ?? `user_${id.substring(0, 6)}`,
       firstName: first_name ?? '',
       lastName: last_name ?? '',
       photo: image_url,
@@ -61,7 +66,7 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ message: 'OK', user: newUser });
+    return NextResponse.json({ message: 'User created', user: newUser });
   }
 
   if (eventType === 'user.updated') {
@@ -70,20 +75,20 @@ export async function POST(req: Request) {
     const user = {
       firstName: first_name ?? '',
       lastName: last_name ?? '',
-      username: username!,
+      username: username ?? `user_${id.substring(0, 6)}`,
       photo: image_url,
     };
 
     const updatedUser = await updateUser(id, user);
-    return NextResponse.json({ message: 'OK', user: updatedUser });
+    return NextResponse.json({ message: 'User updated', user: updatedUser });
   }
 
   if (eventType === 'user.deleted') {
     const { id } = evt.data;
     const deletedUser = await deleteUser(id!);
-    return NextResponse.json({ message: 'OK', user: deletedUser });
+    return NextResponse.json({ message: 'User deleted', user: deletedUser });
   }
 
   console.log(`Unhandled event type: ${eventType}`);
-  return new Response('', { status: 200 });
+  return new Response(`Event ${eventType} not handled`, { status: 200 });
 }
