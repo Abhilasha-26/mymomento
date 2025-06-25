@@ -27,7 +27,7 @@ function Header() {
         <nav className="hidden md:flex gap-8 font-medium">
           <a href="/" className="text-white hover:text-orange-500 transition">Home</a>
           <a href="/events" className="text-white hover:text-orange-500 transition">Events</a>
-          <a href="/testimonials" className="text-white hover:text-orange-500 transition">Testimonials</a>
+          <a href="/profile" className="text-white hover:text-orange-500 transition">My Profile</a>
           <a href="/about" className="text-white hover:text-orange-500 transition">About</a>
           <a href="/contact" className="text-white hover:text-orange-500 transition">Contact</a>
         </nav>

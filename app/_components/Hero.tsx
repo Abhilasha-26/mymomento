@@ -1,8 +1,23 @@
 import React from 'react'
 import Image from "next/image";
 import Link from "next/link";
+import Collection from './Collection';
+import { getAllEvents } from '@/lib/actions/event.actions';
+import Search from './Search';
+import { SearchParamProps } from '@/types';
+import CategoryFilter from './CategoryFilter';
 
-function Hero() {
+async function Hero({searchParams}:SearchParamProps) {
+  
+  const page=Number(searchParams?.page) || 1;
+  const searchText=(searchParams?.query as string) || '';
+  const category=(searchParams?.category as  string) || '';
+  const events= await getAllEvents({
+    query:searchText,
+    category,
+    page,
+    limit:6
+  })
   return (
     <div>
         <div>
@@ -71,7 +86,40 @@ function Hero() {
           </Link>
         </div>
       </div>
+
     </section>
+<section id="events" className="bg-black py-20 px-6 md:px-16 text-white">
+  <div className="max-w-7xl mx-auto">
+    {/* Section Heading */}
+    <div className="mb-12 text-center">
+      <h2 className="text-3xl sm:text-4xl font-bold mb-3">
+        Discover <span className="text-orange-500">Live</span> Campus Events
+      </h2>
+      <p className="text-gray-400 max-w-2xl mx-auto">
+        Explore a curated collection of college events — from electrifying fests to inspirational talks. Don't miss out!
+      </p>
+    </div>
+
+    {/* Optional Filters (search/category) */}
+    <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+      {/* Replace below with your actual search and category filter components */}
+      <Search/>
+      <CategoryFilter/>
+    </div>
+
+    {/* Event Cards Grid */}
+    <Collection
+      data={events?.data}
+      emptyTitle="No Events Found"
+      emptyStateSubtext="Come back later"
+      collectionType="All_Events"
+      limit={6}
+      page={page}
+      totalPages={events?.totalPages}
+    />
+  </div>
+</section>
+
 
 
         </div>

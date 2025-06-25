@@ -40,10 +40,10 @@ function NavItems() {
             <Link href="/" className="text-lg font-medium text-gray-800 hover:text-orange-500">
               Home
             </Link>
-            <Link href="/events" className="text-lg font-medium text-gray-800 hover:text-orange-500">
+            <Link href="/events/create" className="text-lg font-medium text-gray-800 hover:text-orange-500">
               Create Events
             </Link>
-            <Link href="/about" className="text-lg font-medium text-gray-800 hover:text-orange-500">
+            <Link href="/profile" className="text-lg font-medium text-gray-800 hover:text-orange-500">
               My Profile
             </Link>
           </nav>
