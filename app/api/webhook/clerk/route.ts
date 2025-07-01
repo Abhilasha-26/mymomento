@@ -23,8 +23,9 @@ export async function POST(req: Request):Promise<Response> {
   }
 
   // 📦 Parse body
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  const body = await req.text(); // ✅ Keep raw body as string
+      console.log("🪪 Headers:", svix_id, svix_timestamp, svix_signature);
+    console.log("📦 Raw Body:", body);
 
   // ✅ Verify webhook
   const wh = new Webhook(WEBHOOK_SECRET);
@@ -37,8 +38,10 @@ export async function POST(req: Request):Promise<Response> {
       'svix-signature': svix_signature,
     }) as WebhookEvent;
   } catch (err) {
-    console.error('❌ Webhook verification failed:', err);
-    return new Response('Webhook verification failed', { status: 400 });
+
+
+    console.error('❌ abhiiii Webhook verification failed:', err);
+    return new Response('abhi Webhook verification failed', { status: 400 });
   }
 
   const eventType = evt.type;
@@ -55,6 +58,8 @@ export async function POST(req: Request):Promise<Response> {
       lastName: last_name ?? '',
       photo: image_url,
     };
+    console.log('Creating user with:', user);
+
 
     const newUser = await createUser(user);
 

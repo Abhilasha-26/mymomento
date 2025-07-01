@@ -5,15 +5,55 @@ import { getEventById, getRelatedEventsByCategory } from '@/lib/actions/event.ac
 import { formatDateTime } from '@/lib/utils';
 import Header from '@/app/_components/Header';
 import Footer from '@/app/_components/Footer';
+import { Metadata } from 'next';
+// import { SearchParamProps } from '@/types'
 
-interface SearchParamProps {
+{/*?added */}
+// interface SearchParamProps {
+//   params: { id: string };
+//   searchParams?: { [key: string]: string | string[] | undefined };
+// }
+
+// const EventDetails = async ({ params, searchParams }: {
+//   params:{id:string};
+//   searchParams?:Record<string,string|string[] | undefined>;})=>{
+//   const id = params.id;
+//   const page = (searchParams?.page as string) || '1';
+
+//   const event = await getEventById(id);
+//   const relatedEvents = await getRelatedEventsByCategory({
+//     categoryId: event.category._id,
+//     eventId: event._id,
+//     page,
+//   });
+//   interface PageProps {
+//   params: { id: string };
+//   searchParams?: { [key: string]: string | string[] | undefined };
+// }
+
+// const EventDetails = async ({ params, searchParams }: PageProps) => {
+//   const id = params.id;
+//   const page = typeof searchParams?.page === 'string' ? searchParams.page : '1';
+
+//   const event = await getEventById(id);
+//   const relatedEvents = await getRelatedEventsByCategory({
+//     categoryId: event.category._id,
+//     eventId: event._id,
+//     page,
+//   });
+
+// interface PageProps {
+//   params: { id: string };
+//   searchParams: { page?: string };
+// }
+type PageProps = {
   params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
-  const id = params.id;
-  const page = (searchParams?.page as string) || '1';
+  searchParams?: { page?: string };
+};
+export default async function EventDetails({ params, searchParams }: PageProps) {
+  const {id} = await params;
+  const searchParamsObj =await searchParams;
+  const page = typeof searchParamsObj?.page === 'string' ? searchParamsObj.page : '1';
 
   const event = await getEventById(id);
   const relatedEvents = await getRelatedEventsByCategory({
@@ -22,6 +62,8 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
     page,
   });
 
+
+//iske issue resolve krne ke baad ...redeploy..cbbm me kyunki usi me webhook daala hai aur vhi legegi webhook seceret ok?
   return (
     <>
       <Header />
@@ -115,7 +157,7 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
             emptyStateSubtext="Come back later"
             collectionType="All_Events"
             limit={3}
-            page={searchParams.page as string}
+            page={searchParams?.page as string}
             totalPages={relatedEvents?.totalPages}
           />
         </section>
@@ -125,4 +167,4 @@ const EventDetails = async ({ params, searchParams }: SearchParamProps) => {
   );
 };
 
-export default EventDetails;
+// export default EventDetails;

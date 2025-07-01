@@ -23,34 +23,33 @@ const getCategoryByName = async (name: string) => {
 
 const populateEvent = (query: any) => {
   return query
-    .populate({ path: 'organizer', model: User, select: '_id firstName lastName' })
+    .populate({ path: 'organizer', model: User, select: '_id firstName lastName clerkId' })
     .populate({ path: 'category', model: Category, select: '_id name' })
 }
 
 // CREATE did one change :{userId}
 export async function createEvent({ userId, event, path }: CreateEventParams) {
   try {
-    await connectToDatabase()
-    //added
-    const id = typeof userId === 'object' && userId.userId ? userId.userId : userId;
+    await connectToDatabase();
+    console.log("📌 Received userId:", userId);
 
-    console.log("Creating event for userId:", id);
-    console.log('Type of userId:', typeof id);
-    const organizer = await User.findById(id)
-    if (!organizer) throw new Error('Organizer not found')
-    
-    console.log({
-      categoryId:event.categoryId,
-      organizerId:id,
-    })
-    const newEvent = await Event.create({ ...event, category: event.categoryId, organizer: id })
+    // Check if userId exists before proceeding
+    if (!userId) {
+      console.error("❌ No userId provided!");
+      throw new Error("userId is required to create an event.");
+    }    
+
+    const organizer = await User.findById(userId.userId)
+    if (!organizer){
+      console.error("❌ Organizer not found for userId:", userId);
+       throw new Error('Organizer not found')
+    }
+    const newEvent = await Event.create({ ...event, category: event.categoryId, organizer: userId.userId })
     revalidatePath(path)
-
+    
     return JSON.parse(JSON.stringify(newEvent))
   } catch (error) {
-    console.log(error);
-    console.error('Create event error:', error);
-    handleError(error);
+    handleError(error)
   }
 }
 
@@ -73,7 +72,11 @@ export async function getEventById(eventId: string) {
 export async function updateEvent({ userId, event, path }: UpdateEventParams) {
   try {
     await connectToDatabase()
-
+      console.log("Attempting to update event:", {
+      eventId: event._id,
+      userId,
+      updates: event
+    })
     const eventToUpdate = await Event.findById(event._id)
     if (!eventToUpdate || eventToUpdate.organizer.toHexString() !== userId) {
       throw new Error('Unauthorized or event not found')
@@ -82,7 +85,7 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
     const updatedEvent = await Event.findByIdAndUpdate(
       event._id,
       { ...event, category: event.categoryId },
-      { new: true }
+      { new: true ,runValidators:true}
     )
     revalidatePath(path)
 

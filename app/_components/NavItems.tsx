@@ -9,10 +9,11 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { Separator } from '../../components/ui/separator';
+import { DialogTitle } from '@radix-ui/react-dialog'; // ✅ Add this
 
 function NavItems() {
   return (
-    <div className="md:hidden"> {/* Hidden on md and up */}
+    <div className="md:hidden">
       <Sheet>
         <SheetTrigger className="align-middle">
           <Image
@@ -25,6 +26,9 @@ function NavItems() {
         </SheetTrigger>
 
         <SheetContent className="flex flex-col gap-6 bg-white">
+          {/* ✅ Add DialogTitle for accessibility */}
+          <DialogTitle className="sr-only">Main Menu</DialogTitle>
+
           {/* Logo */}
           <Image
             src="/assets/icons/logo.png"

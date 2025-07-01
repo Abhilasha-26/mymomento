@@ -20,7 +20,7 @@ const Card = ({ event,userId, hasOrderLink, hidePrice }: CardProps) => {
 
   
 
-  const isEventCreator = userId === event.organizer._id.toString();
+  const isEventCreator = userId === event.organizer.clerkId;
     console.log('userId:', userId);
     console.log("hasOrderLink:", hasOrderLink);
 

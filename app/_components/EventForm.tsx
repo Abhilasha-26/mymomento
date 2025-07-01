@@ -50,6 +50,10 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
  
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
     let uploadedImageUrl = values.imageUrl;
+    console.log("Form Type:", type);              // Should be "Update"
+    console.log("Event ID received:", eventId);   // Should NOT be undefined
+    console.log("Form Submitted with values:", values);
+
 
     if(files.length > 0) {
       const uploadedImages = await startUpload(files)
@@ -80,14 +84,15 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
 
     if(type === 'Update') {
       if(!eventId) {
+        console.log("NO event provided for update")
         router.back()
         return;
       }
 
       try {
         const updatedEvent = await updateEvent({
-          userId,
-          event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
+          userId:userId.userId,
+          event: { ...values, imageUrl: uploadedImageUrl, _id: eventId,categoryId:values.categoryId },
           path: `/events/${eventId}`
         })
 
@@ -212,7 +217,7 @@ return (
                 <FormItem className="w-full">
                   <FormControl>
                     <div className="flex items-center bg-black border border-orange-500 rounded-full px-4 py-2">
-                      <Image src="/assets/icons/calendar.svg" alt="calendar" width={24} height={24} />
+                      <Image src="/assets/icons/calendar (1).svg" alt="calendar" width={24} height={24} className="bg-amber-700" />
                       <p className="ml-3 text-orange-400">{label}</p>
                       <DatePicker 
                         selected={field.value} 

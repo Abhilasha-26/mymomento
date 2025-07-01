@@ -1,10 +1,12 @@
-import Search  from '../../_components/Search'
+// import Search  from '../../_components/Search'
 import { getOrdersByEvent } from '@/lib/actions/order.actions'
 import { formatDateTime, formatPrice } from '@/lib/utils'
 import { SearchParamProps } from '@/types'
 import { IOrderItem } from '@/lib/database/models/order.model'
 import Header from '@/app/_components/Header'
 import Footer from '@/app/_components/Footer'
+import SearchWrapper from './SearchWrapper'
+
 
 const Orders = async ({ searchParams }: SearchParamProps) => {
   const eventId = (searchParams?.eventId as string) || ''
@@ -21,7 +23,7 @@ const Orders = async ({ searchParams }: SearchParamProps) => {
       </section>
 
       <section className="wrapper mt-8">
-        <Search placeholder="Search buyer name..." />
+        <SearchWrapper/>
       </section>
 
       <section className="wrapper overflow-x-auto">

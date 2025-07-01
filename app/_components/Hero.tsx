@@ -1,3 +1,4 @@
+
 import React from 'react'
 import Image from "next/image";
 import Link from "next/link";
@@ -6,7 +7,8 @@ import { getAllEvents } from '@/lib/actions/event.actions';
 import Search from './Search';
 import { SearchParamProps } from '@/types';
 import CategoryFilter from './CategoryFilter';
-
+import { SignedIn } from '@clerk/nextjs';
+import { Suspense } from 'react';
 async function Hero({searchParams}:SearchParamProps) {
   
   const page=Number(searchParams?.page) || 1;
@@ -32,7 +34,8 @@ async function Hero({searchParams}:SearchParamProps) {
           Create, manage, and showcase your college events with ease — all in one place.
         </p>
         <div className="flex gap-4">
-          <Link href="#events">
+
+          <Link href="/events/create">
             <button className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700 transition">
               Get Started!
             </button>
@@ -103,7 +106,9 @@ async function Hero({searchParams}:SearchParamProps) {
     {/* Optional Filters (search/category) */}
     <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
       {/* Replace below with your actual search and category filter components */}
-      <Search/>
+      <Suspense fallback={<div>Loading filters...</div>}>
+        <Search />
+      </Suspense>
       <CategoryFilter/>
     </div>
 
