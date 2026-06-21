@@ -23,33 +23,48 @@ const getCategoryByName = async (name: string) => {
 
 const populateEvent = (query: any) => {
   return query
-    .populate({ path: 'organizer', model: User, select: '_id firstName lastName clerkId' })
-    .populate({ path: 'category', model: Category, select: '_id name' })
+    .populate({
+      path: 'organizer',
+      model: User,
+      select: '_id firstName lastName email'
+    })
+    .populate({
+      path: 'category',
+      model: Category,
+      select: '_id name'
+    });
 }
 
 // CREATE did one change :{userId}
-export async function createEvent({ userId, event, path }: CreateEventParams) {
+export async function createEvent({
+  userId,
+  event,
+  path,
+}: CreateEventParams) {
   try {
     await connectToDatabase();
-    console.log("📌 Received userId:", userId);
 
-    // Check if userId exists before proceeding
     if (!userId) {
-      console.error("❌ No userId provided!");
-      throw new Error("userId is required to create an event.");
-    }    
-
-    const organizer = await User.findById(userId.userId)
-    if (!organizer){
-      console.error("❌ Organizer not found for userId:", userId);
-       throw new Error('Organizer not found')
+      throw new Error("User ID is required");
     }
-    const newEvent = await Event.create({ ...event, category: event.categoryId, organizer: userId.userId })
-    revalidatePath(path)
-    
-    return JSON.parse(JSON.stringify(newEvent))
+
+    const organizer = await User.findById(userId);
+
+    if (!organizer) {
+      throw new Error("Organizer not found");
+    }
+
+    const newEvent = await Event.create({
+      ...event,
+      category: event.categoryId,
+      organizer: userId,
+    });
+
+    revalidatePath(path);
+
+    return JSON.parse(JSON.stringify(newEvent));
   } catch (error) {
-    handleError(error)
+    handleError(error);
   }
 }
 
@@ -95,10 +110,18 @@ export async function updateEvent({ userId, event, path }: UpdateEventParams) {
   }
 }
 
+
 // DELETE
-export async function deleteEvent({ eventId, path }: DeleteEventParams) {
+export async function deleteEvent({ eventId, path, userId }: DeleteEventParams) {
   try {
     await connectToDatabase()
+
+    const eventToDelete = await Event.findById(eventId)
+    if (!eventToDelete) throw new Error('Event not found')
+
+    if (eventToDelete.organizer.toHexString() !== userId) {
+      throw new Error('Unauthorized: you are not the organizer of this event')
+    }
 
     const deletedEvent = await Event.findByIdAndDelete(eventId)
     if (deletedEvent) revalidatePath(path)
@@ -137,31 +160,38 @@ export async function getAllEvents({ query, limit = 6, page, category }: GetAllE
 }
 
 // GET EVENTS BY ORGANIZER
-export async function getEventsByUser({ userId, limit = 6, page }: GetEventsByUserParams) {
+export async function getEventsByUser({
+  userId,
+  limit = 6,
+  page,
+}: GetEventsByUserParams) {
   try {
-    await connectToDatabase()
-    console.log("geteventuser:" ,userId);
+    await connectToDatabase();
 
-    const conditions = { organizer: userId }
-    const skipAmount = (page - 1) * limit
+    const conditions = {
+      organizer: userId,
+    };
 
-    console.log("Searching events where organizer is:", userId);
-const eventCheck = await Event.find({}); // TEMP: just to see what's in DB
-console.log("All Events:", eventCheck.map(e => ({ id: e._id, organizer: e.organizer })));
-
+    const skipAmount = (Number(page) - 1) * limit;
 
     const eventsQuery = Event.find(conditions)
       .sort({ createdAt: 'desc' })
       .skip(skipAmount)
-      .limit(limit)
+      .limit(limit);
 
-    const events = await populateEvent(eventsQuery)
-    const eventsCount = await Event.countDocuments(conditions)
+    const events = await populateEvent(eventsQuery);
+    const eventsCount = await Event.countDocuments(conditions);
 
-    return { data: JSON.parse(JSON.stringify(events)), totalPages: Math.ceil(eventsCount / limit) }
+    return {
+      data: JSON.parse(JSON.stringify(events)),
+      totalPages: Math.ceil(eventsCount / limit),
+    };
   } catch (error) {
     handleError(error);
-    return { data: [], totalPages: 0 };
+    return {
+      data: [],
+      totalPages: 0,
+    };
   }
 }
 

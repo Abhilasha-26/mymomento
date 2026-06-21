@@ -1,67 +1,113 @@
-import React from 'react';
 import Header from '../../_components/Header';
 import Footer from '../../_components/Footer';
-import { Card, CardContent } from '../../../components/ui/card';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, ArrowUpRight } from 'lucide-react';
 
-const Contact: React.FC = () => {
+const Contact = () => {
   return (
-    <div className='min-h-screen bg-black text-white'>
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Header />
-      <section className="w-full">
-        {/* Top Hero Section */}
-        <div className="bg-black text-white px-6 py-40 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Contact <span className='text-orange-500'>Us</span>
-            </h1>
-            <p className="text-gray-300 text-lg">
-              We’d love to hear from you. Reach out and let's connect!
-            </p>
-          </div>
-        </div>
 
-        <div className="text-center mt-16 px-4">
-          <p className="text-orange-500 uppercase text-sm font-medium mb-2 tracking-wide">
-            Contact
+      {/* HERO */}
+      <section className="relative px-6 md:px-16 pt-40 pb-20 overflow-hidden">
+        <div className="absolute -top-32 right-1/4 w-[28rem] h-[28rem] bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative max-w-3xl">
+          <span className="font-mono text-orange-400 text-xs font-medium tracking-[0.2em] uppercase">
+            Get in touch
+          </span>
+
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mt-5">
+            Let&apos;s <span className="text-orange-500">talk</span>.
+          </h1>
+
+          <p className="mt-6 text-gray-400 text-lg leading-relaxed font-light max-w-xl">
+            Questions, feedback, or just want to say hi — reach out through
+            whichever channel works best for you.
           </p>
-          <h2 className="text-3xl font-bold mb-4">Get in Touch With Us</h2>
-          <p className="text-gray-600 max-w-xl mx-auto text-sm md:text-base">
-            Feel free to reach out via phone, email, or visit our head office. We’ll be happy to help.
-          </p>
-        </div>
-
-        {/* Cards Section */}
-        <div className="mt-12 px-6 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {/* Phone */}
-          <Card className="bg-black text-white rounded-2xl shadow-md hover:scale-105 hover:-translate-y-2 transition-transform duration-300 ease-in-out">
-            <CardContent className="flex flex-col items-center text-center py-8 px-4">
-              <Phone className="text-orange-500 mb-4 w-8 h-8" />
-              <h3 className="text-xl font-semibold mb-2">Phone</h3>
-              <p className="text-gray-300 text-sm">+91 9876543210</p>
-            </CardContent>
-          </Card>
-
-          {/* Email */}
-          <Card className="bg-black text-white rounded-2xl shadow-md hover:scale-105 hover:-translate-y-2 transition-transform duration-300 ease-in-out">
-            <CardContent className="flex flex-col items-center text-center py-8 px-4">
-              <Mail className="text-orange-500 mb-4 w-8 h-8" />
-              <h3 className="text-xl font-semibold mb-2">Email</h3>
-              <p className="text-gray-300 text-sm">hello@momento.ai</p>
-            </CardContent>
-          </Card>
-
-          {/* Head Office */}
-          <Card className="bg-black text-white rounded-2xl shadow-md hover:scale-105 hover:-translate-y-2 transition-transform duration-300 ease-in-out">
-            <CardContent className="flex flex-col items-center text-center py-8 px-4">
-              <MapPin className="text-orange-500 mb-4 w-8 h-8" />
-              <h3 className="text-xl font-semibold mb-2">Head Office</h3>
-              <p className="text-gray-300 text-sm">123 MG Road, Delhi, India</p>
-            </CardContent>
-          </Card>
         </div>
       </section>
-      <br />
+
+      {/* CONTACT LIST */}
+      <section className="px-6 md:px-16 pb-24 border-t border-white/10">
+        <div className="max-w-4xl mx-auto">
+
+          {/* Phone */}
+          <a
+            href="tel:+919876543210"
+            className="group flex items-center justify-between gap-6 py-8 border-b border-white/10 transition-colors duration-200 hover:border-orange-500/40"
+          >
+            <div className="flex items-center gap-6">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 border border-white/10 text-orange-500 shrink-0">
+                <Phone className="w-5 h-5" />
+              </div>
+
+              <div>
+                <p className="font-mono text-xs text-zinc-500 tracking-[0.15em] uppercase mb-1">
+                  Phone
+                </p>
+
+                <p className="text-xl font-semibold text-white group-hover:text-orange-400 transition-colors">
+                  +91 98765 43210
+                </p>
+              </div>
+            </div>
+
+            <ArrowUpRight className="w-5 h-5 text-zinc-600 group-hover:text-orange-500 transition-colors shrink-0" />
+          </a>
+
+          {/* Email */}
+          <a
+            href="mailto:hello@momento.ai"
+            className="group flex items-center justify-between gap-6 py-8 border-b border-white/10 transition-colors duration-200 hover:border-orange-500/40"
+          >
+            <div className="flex items-center gap-6">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 border border-white/10 text-orange-500 shrink-0">
+                <Mail className="w-5 h-5" />
+              </div>
+
+              <div>
+                <p className="font-mono text-xs text-zinc-500 tracking-[0.15em] uppercase mb-1">
+                  Email
+                </p>
+
+                <p className="text-xl font-semibold text-white group-hover:text-orange-400 transition-colors">
+                  hello@momento.ai
+                </p>
+              </div>
+            </div>
+
+            <ArrowUpRight className="w-5 h-5 text-zinc-600 group-hover:text-orange-500 transition-colors shrink-0" />
+          </a>
+
+          {/* Address */}
+          <a
+            href="https://maps.google.com/?q=123+MG+Road+Delhi+India"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center justify-between gap-6 py-8 border-b border-white/10 transition-colors duration-200 hover:border-orange-500/40"
+          >
+            <div className="flex items-center gap-6">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-white/5 border border-white/10 text-orange-500 shrink-0">
+                <MapPin className="w-5 h-5" />
+              </div>
+
+              <div>
+                <p className="font-mono text-xs text-zinc-500 tracking-[0.15em] uppercase mb-1">
+                  Head Office
+                </p>
+
+                <p className="text-xl font-semibold text-white group-hover:text-orange-400 transition-colors">
+                  123 MG Road, Delhi, India
+                </p>
+              </div>
+            </div>
+
+            <ArrowUpRight className="w-5 h-5 text-zinc-600 group-hover:text-orange-500 transition-colors shrink-0" />
+          </a>
+
+        </div>
+      </section>
+
       <Footer />
     </div>
   );

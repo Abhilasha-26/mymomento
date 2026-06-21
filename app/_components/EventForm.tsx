@@ -24,7 +24,7 @@ import { IEvent } from "@/lib/database/models/event.model"
 
 
 type EventFormProps = {
-  userId: string
+  userId: string,
   type: "Create" | "Update"
   event?: IEvent,
   eventId?: string
@@ -62,7 +62,7 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         return
       }
 
-      uploadedImageUrl = uploadedImages[0].url
+      uploadedImageUrl = uploadedImages[0].ufsUrl;
     }
 
     if(type === 'Create') {
@@ -88,10 +88,10 @@ const EventForm = ({ userId, type, event, eventId }: EventFormProps) => {
         router.back()
         return;
       }
-
+      console.log("userId for update is:",userId);
       try {
         const updatedEvent = await updateEvent({
-          userId:userId.userId,
+          userId,
           event: { ...values, imageUrl: uploadedImageUrl, _id: eventId,categoryId:values.categoryId },
           path: `/events/${eventId}`
         })
@@ -217,15 +217,15 @@ return (
                 <FormItem className="w-full">
                   <FormControl>
                     <div className="flex items-center bg-black border border-orange-500 rounded-full px-4 py-2">
-                      <Image src="/assets/icons/calendar (1).svg" alt="calendar" width={24} height={24} className="bg-amber-700" />
-                      <p className="ml-3 text-orange-400">{label}</p>
+                      <Image src="/assets/icons/calendar (1).svg" alt="calendar" width={24} height={24} className="bg-black" />
+                      <p className="ml-3 text-orange-500">{label}</p>
                       <DatePicker 
                         selected={field.value} 
                         onChange={(date) => field.onChange(date)} 
                         showTimeSelect
                         timeInputLabel="Time:"
                         dateFormat="MM/dd/yyyy h:mm aa"
-                        wrapperClassName="ml-3 text-black"
+                        wrapperClassName="ml-3 text-white"
                       />
                     </div>
                   </FormControl>

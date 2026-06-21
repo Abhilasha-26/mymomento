@@ -1,20 +1,22 @@
-import Image from "next/image";
 import Header from "./_components/Header";
-// import Hero from "./_components/Hero";
 import Footer from "./_components/Footer";
-import { Suspense } from "react";
 import dynamic from "next/dynamic";
+import { Suspense } from "react";
+
 const Hero = dynamic(() => import("./_components/Hero"), {
   ssr: true,
 });
-export default function Home() {
+
+export default function Home({ searchParams }: any) {
   return (
     <div>
-      <Header/>
-        <Suspense fallback={<div className="text-white p-4">Loading hero...</div>}>
-          <Hero />
-        </Suspense>
-      <Footer/>
+      <Header />
+
+      <Suspense fallback={<div className="text-white p-4">Loading hero...</div>}>
+        <Hero searchParams={searchParams} />
+      </Suspense>
+
+      <Footer />
     </div>
   );
 }

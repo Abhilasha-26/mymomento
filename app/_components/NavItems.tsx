@@ -9,9 +9,21 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { Separator } from '../../components/ui/separator';
-import { DialogTitle } from '@radix-ui/react-dialog'; // ✅ Add this
+import { DialogTitle } from '@radix-ui/react-dialog';
 
-function NavItems() {
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+interface NavItemsProps {
+  user: User | null;
+  onLogout: () => void;
+}
+
+function NavItems({ user, onLogout }: NavItemsProps) {
   return (
     <div className="md:hidden">
       <Sheet>
@@ -26,29 +38,102 @@ function NavItems() {
         </SheetTrigger>
 
         <SheetContent className="flex flex-col gap-6 bg-white">
-          {/* ✅ Add DialogTitle for accessibility */}
-          <DialogTitle className="sr-only">Main Menu</DialogTitle>
+          <DialogTitle className="sr-only">
+            Main Menu
+          </DialogTitle>
 
           {/* Logo */}
           <Image
             src="/assets/icons/logo.png"
             alt="logo"
-            width={70}
+            width={60}
             height={38}
           />
 
           <Separator className="border border-gray-100" />
 
-          {/* Navigation Links */}
-          <nav className="flex flex-col gap-4">
-            <Link href="/" className="text-lg font-medium text-gray-800 hover:text-orange-500">
+          {/* Logged In User Section */}
+          {user && (
+            <>
+              <div className="px-3 flex flex-col gap-2">
+                <p className="text-lg font-semibold text-gray-900">
+                  Hi, {user.firstName}
+                </p>
+
+                <button
+                  onClick={onLogout}
+                  className="text-left text-red-500 font-medium"
+                >
+                  Logout
+                </button>
+              </div>
+
+              <Separator className="border border-gray-100" />
+            </>
+          )}
+
+          {/* Navigation */}
+          <nav className="flex flex-col gap-4 ml-3">
+            <Link
+              href="/"
+              className="text-lg font-medium text-gray-800 hover:text-orange-500"
+            >
               Home
             </Link>
-            <Link href="/events/create" className="text-lg font-medium text-gray-800 hover:text-orange-500">
-              Create Events
+
+            <Link
+              href="/events"
+              className="text-lg font-medium text-gray-800 hover:text-orange-500"
+            >
+              Events
             </Link>
-            <Link href="/profile" className="text-lg font-medium text-gray-800 hover:text-orange-500">
-              My Profile
+
+            {user ? (
+              <>
+                <Link
+                  href="/events/create"
+                  className="text-lg font-medium text-gray-800 hover:text-orange-500"
+                >
+                  Create Events
+                </Link>
+
+                <Link
+                  href="/profile"
+                  className="text-lg font-medium text-gray-800 hover:text-orange-500"
+                >
+                  My Profile
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  className="text-lg font-medium text-gray-800 hover:text-orange-500"
+                >
+                  Sign In
+                </Link>
+
+                <Link
+                  href="/sign-up"
+                  className="text-lg font-medium text-gray-800 hover:text-orange-500"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+
+            <Link
+              href="/about"
+              className="text-lg font-medium text-gray-800 hover:text-orange-500"
+            >
+              About
+            </Link>
+
+            <Link
+              href="/contact"
+              className="text-lg font-medium text-gray-800 hover:text-orange-500"
+            >
+              Contact
             </Link>
           </nav>
         </SheetContent>

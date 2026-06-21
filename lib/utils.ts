@@ -1,93 +1,107 @@
-import { type ClassValue, clsx } from 'clsx'
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+import qs from "query-string";
 
-import { twMerge } from 'tailwind-merge'
-import qs from 'query-string'
-
-import { UrlQueryParams, RemoveUrlQueryParams } from '../types'
+import { UrlQueryParams, RemoveUrlQueryParams } from "../types";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-export const formatDateTime = (dateString: Date) => {
+// FORMAT DATE
+export const formatDateTime = (date: Date | string) => {
   const dateTimeOptions: Intl.DateTimeFormatOptions = {
-    weekday: 'short', // abbreviated weekday name (e.g., 'Mon')
-    month: 'short', // abbreviated month name (e.g., 'Oct')
-    day: 'numeric', // numeric day of the month (e.g., '25')
-    hour: 'numeric', // numeric hour (e.g., '8')
-    minute: 'numeric', // numeric minute (e.g., '30')
-    hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
-  }
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
 
   const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: 'short', // abbreviated weekday name (e.g., 'Mon')
-    month: 'short', // abbreviated month name (e.g., 'Oct')
-    year: 'numeric', // numeric year (e.g., '2023')
-    day: 'numeric', // numeric day of the month (e.g., '25')
-  }
+    weekday: "short",
+    month: "short",
+    year: "numeric",
+    day: "numeric",
+  };
 
   const timeOptions: Intl.DateTimeFormatOptions = {
-    hour: 'numeric', // numeric hour (e.g., '8')
-    minute: 'numeric', // numeric minute (e.g., '30')
-    hour12: true, // use 12-hour clock (true) or 24-hour clock (false)
-  }
-
-  const formattedDateTime: string = new Date(dateString).toLocaleString('en-US', dateTimeOptions)
-
-  const formattedDate: string = new Date(dateString).toLocaleString('en-US', dateOptions)
-
-  const formattedTime: string = new Date(dateString).toLocaleString('en-US', timeOptions)
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  };
 
   return {
-    dateTime: formattedDateTime,
-    dateOnly: formattedDate,
-    timeOnly: formattedTime,
-  }
-}
+    dateTime: new Date(date).toLocaleString("en-US", dateTimeOptions),
+    dateOnly: new Date(date).toLocaleString("en-US", dateOptions),
+    timeOnly: new Date(date).toLocaleString("en-US", timeOptions),
+  };
+};
 
-export const convertFileToUrl = (file: File) => URL.createObjectURL(file)
+// FILE TO URL
+export const convertFileToUrl = (file: File) => URL.createObjectURL(file);
 
+// FORMAT PRICE
 export const formatPrice = (price: string) => {
-  const amount = parseFloat(price)
-  const formattedPrice = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount)
+  const amount = parseFloat(price);
 
-  return formattedPrice
-}
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+  }).format(amount);
+};
 
-export function formUrlQuery({ params, key, value }: UrlQueryParams) {
-  const currentUrl = qs.parse(params)
+// ADD QUERY PARAM
+export function formUrlQuery({
+  params,
+  key,
+  value,
+}: UrlQueryParams) {
+  const currentUrl = qs.parse(params);
 
-  currentUrl[key] = value
-
-  return qs.stringifyUrl(
-    {
-      url: window.location.pathname,
-      query: currentUrl,
-    },
-    { skipNull: true }
-  )
-}
-
-export function removeKeysFromQuery({ params, keysToRemove }: RemoveUrlQueryParams) {
-  const currentUrl = qs.parse(params)
-
-  keysToRemove.forEach(key => {
-    delete currentUrl[key]
-  })
+  currentUrl[key] = value;
 
   return qs.stringifyUrl(
     {
       url: window.location.pathname,
       query: currentUrl,
     },
-    { skipNull: true }
-  )
+    {
+      skipNull: true,
+    }
+  );
 }
 
+// REMOVE QUERY PARAM
+export function removeKeysFromQuery({
+  params,
+  keysToRemove,
+}: RemoveUrlQueryParams) {
+  const currentUrl = qs.parse(params);
+
+  keysToRemove.forEach((key) => {
+    delete currentUrl[key];
+  });
+
+  return qs.stringifyUrl(
+    {
+      url: window.location.pathname,
+      query: currentUrl,
+    },
+    {
+      skipNull: true,
+    }
+  );
+}
+
+// ERROR HANDLER
 export const handleError = (error: unknown) => {
-  console.error(error)
-  throw new Error(typeof error === 'string' ? error : JSON.stringify(error))
-}
+  console.error("❌ Error:", error);
+
+  if (error instanceof Error) {
+    throw new Error(error.message);
+  }
+
+  throw new Error("Something went wrong");
+};

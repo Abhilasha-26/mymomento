@@ -1,170 +1,188 @@
-import Image from 'next/image';
-import CheckoutButton from '../../../_components/CheckoutButton';
-import Collection from '../../../_components/Collection';
-import { getEventById, getRelatedEventsByCategory } from '@/lib/actions/event.actions';
-import { formatDateTime } from '@/lib/utils';
-import Header from '@/app/_components/Header';
-import Footer from '@/app/_components/Footer';
-import { Metadata } from 'next';
-// import { SearchParamProps } from '@/types'
+import Image from "next/image";
+import CheckoutButton from "../../../_components/CheckoutButton";
+import Collection from "../../../_components/Collection";
+import {
+  getEventById,
+  getRelatedEventsByCategory,
+} from "@/lib/actions/event.actions";
+import { getCurrentUser } from "@/lib/auth";
+import { formatDateTime } from "@/lib/utils";
+import Header from "@/app/_components/Header";
+import Footer from "@/app/_components/Footer";
 
-{/*?added */}
-// interface SearchParamProps {
-//   params: { id: string };
-//   searchParams?: { [key: string]: string | string[] | undefined };
-// }
-
-// const EventDetails = async ({ params, searchParams }: {
-//   params:{id:string};
-//   searchParams?:Record<string,string|string[] | undefined>;})=>{
-//   const id = params.id;
-//   const page = (searchParams?.page as string) || '1';
-
-//   const event = await getEventById(id);
-//   const relatedEvents = await getRelatedEventsByCategory({
-//     categoryId: event.category._id,
-//     eventId: event._id,
-//     page,
-//   });
-//   interface PageProps {
-//   params: { id: string };
-//   searchParams?: { [key: string]: string | string[] | undefined };
-// }
-
-// const EventDetails = async ({ params, searchParams }: PageProps) => {
-//   const id = params.id;
-//   const page = typeof searchParams?.page === 'string' ? searchParams.page : '1';
-
-//   const event = await getEventById(id);
-//   const relatedEvents = await getRelatedEventsByCategory({
-//     categoryId: event.category._id,
-//     eventId: event._id,
-//     page,
-//   });
-
-// interface PageProps {
-//   params: { id: string };
-//   searchParams: { page?: string };
-// }
 type PageProps = {
-  params: { id: string };
-  searchParams?: { page?: string };
+  params: Promise<{ id: string }>;
+  searchParams?: Promise<{ page?: string }>;
 };
-export default async function EventDetails({ params, searchParams }: PageProps) {
-  const {id} = await params;
-  const searchParamsObj =await searchParams;
-  const page = typeof searchParamsObj?.page === 'string' ? searchParamsObj.page : '1';
 
+export default async function EventDetails({
+  params,
+  searchParams,
+}: PageProps) {
+  const { id } = await params;
+  const sp = await searchParams;
+
+  const page = Number(sp?.page ?? 1);
+  const currentUser = await getCurrentUser();
+  
   const event = await getEventById(id);
+
   const relatedEvents = await getRelatedEventsByCategory({
     categoryId: event.category._id,
     eventId: event._id,
-    page,
+    page: String(page),
   });
 
-
-//iske issue resolve krne ke baad ...redeploy..cbbm me kyunki usi me webhook daala hai aur vhi legegi webhook seceret ok?
   return (
     <>
-      <Header />
-      <div className="bg-black text-white min-h-screen">
-        {/* Hero Section */}
-        <section className="flex justify-center mt-8 py-10 px-4 bg-dotted-pattern bg-contain">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 2xl:max-w-7xl w-full">
-            {/* Event Image */}
-            <div className="rounded-xl overflow-hidden border-2 border-orange-500 shadow-lg max-h-[500px]">
-              <Image
-                src={event.imageUrl}
-                alt="event image"
-                width={1000}
-                height={1000}
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
+    <div className="bg-[#0a0a0a] text-white min-h-screen">
+  <Header />
 
-            {/* Event Details */}
-            <div className="flex flex-col gap-6 md:gap-8 justify-center">
-              {/* Title and Tags */}
-              <div className="flex flex-col gap-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-white">{event.title}</h2>
+  {/* HERO */}
+  <section className="relative overflow-hidden pt-32 pb-16 px-6 md:px-16">
+    <div className="absolute -top-32 right-1/4 w-[28rem] h-[28rem] bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="bg-orange-500 text-black font-semibold text-sm px-4 py-1 rounded-full">
-                    {event.isFree ? 'FREE' : `$ ${event.price}`}
-                  </span>
-                  <span className="bg-gray-800 text-white text-sm px-4 py-1 rounded-full">
-                    {event.category.name}
-                  </span>
-                  <span className="text-white text-sm ml-auto">
-                    by{' '}
-                    <span className="text-orange-400 font-medium">
-                      {event.organizer.firstName} {event.organizer.lastName}
-                    </span>
-                  </span>
-                </div>
-              </div>
-              <CheckoutButton event={event} />
+    <div className="relative max-w-4xl">
+      <h1 className="text-5xl md:text-6xl font-bold mt-4 tracking-tight">
+        {event.title}
+      </h1>
 
-              {/* Date and Location */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Image src="/assets/icons/calendar.svg" alt="calendar" width={28} height={28} />
-                  <div className="flex flex-col text-sm sm:text-base">
-                    <p>
-                      <strong>Starts:</strong>{' '}
-                      {formatDateTime(event.startDateTime).dateOnly} - {formatDateTime(event.startDateTime).timeOnly}
-                    </p>
-                    <p>
-                      <strong>Ends:</strong>{' '}
-                      {formatDateTime(event.endDateTime).dateOnly} - {formatDateTime(event.endDateTime).timeOnly}
-                    </p>
-                  </div>
-                </div>
+      <p className="mt-5 text-zinc-400 text-lg max-w-2xl">
+        Explore event information, venue details, timings and reserve your
+        spot instantly.
+      </p>
+    </div>
+  </section>
 
-                <div className="flex items-center gap-3 text-sm sm:text-base">
-                  <Image src="/assets/icons/location.svg" alt="location" width={28} height={28} />
-                  <p>{event.location}</p>
-                </div>
-              </div>
+  {/* EVENT SECTION */}
+  <section className="px-6 md:px-16 pb-24">
+    <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-start">
 
-              {/* Description */}
-              <div className="space-y-2">
-                <h3 className="text-lg text-orange-400 font-semibold">What You'll Learn:</h3>
-                <p className="text-white text-sm sm:text-base">{event.description}</p>
-                {event.url && (
-                  <a
-                    href={event.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-orange-500 underline text-sm break-words"
-                  >
-                    {event.url}
-                  </a>
-                )}
-              </div>
+      {/* IMAGE */}
+      <div className="group relative overflow-hidden rounded-3xl border border-orange-500/20 bg-white/5">
+        <Image
+          src={event.imageUrl}
+          alt={event.title}
+          width={1000}
+          height={1000}
+          className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
+        />
+      </div>
+
+      {/* DETAILS */}
+      <div className="space-y-8">
+
+        <div className="flex flex-wrap gap-3">
+          <span className="bg-orange-500 text-black font-semibold px-5 py-2 rounded-full">
+            {event.isFree ? "FREE" : `$${event.price}`}
+          </span>
+
+          <span className="bg-white/5 border border-white/10 px-5 py-2 rounded-full">
+            {event.category.name}
+          </span>
+        </div>
+
+        <div>
+          <h2 className="text-3xl font-bold mb-3">
+            {event.title}
+          </h2>
+
+          <p className="text-orange-400">
+            Organized by{" "}
+            {event.organizer
+              ? `${event.organizer.firstName} ${event.organizer.lastName}`
+              : "Unknown Organizer"}
+          </p>
+        </div>
+
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5">
+
+          <div className="flex items-center gap-3">
+            <span className="text-orange-500">📅</span>
+            <div>
+              <p className="text-sm text-zinc-500">Starts</p>
+              <p>{formatDateTime(event.startDateTime).dateOnly}</p>
             </div>
           </div>
-        </section>
 
-        {/* Related Events */}
-        <section className="wrapper px-4 py-12 flex flex-col gap-10 md:gap-14">
-          <h2 className="text-2xl md:text-3xl font-bold text-white border-b border-orange-500 pb-2 w-fit">
-            Related Events
-          </h2>
-          <Collection
-            data={relatedEvents?.data}
-            emptyTitle="No Events Found"
-            emptyStateSubtext="Come back later"
-            collectionType="All_Events"
-            limit={3}
-            page={searchParams?.page as string}
-            totalPages={relatedEvents?.totalPages}
-          />
-        </section>
-        <Footer />
+          <div className="flex items-center gap-3">
+            <span className="text-orange-500">⏳</span>
+            <div>
+              <p className="text-sm text-zinc-500">Ends</p>
+              <p>{formatDateTime(event.endDateTime).dateOnly}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-orange-500">📍</span>
+            <div>
+              <p className="text-sm text-zinc-500">Location</p>
+              <p>{event.location}</p>
+            </div>
+          </div>
+        </div>
+
+        <CheckoutButton
+          event={event}
+          userId={currentUser?.userId}
+        />
+
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+          <h3 className="text-xl font-semibold mb-4 text-orange-400">
+            About this event
+          </h3>
+
+          <p className="text-zinc-300 leading-relaxed whitespace-pre-line">
+            {event.description}
+          </p>
+        </div>
+
+        {event.url && (
+          <a
+            href={event.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition"
+          >
+            Visit Event Website →
+          </a>
+        )}
       </div>
+    </div>
+  </section>
+
+  {/* RELATED EVENTS */}
+  <section className="border-t border-white/10 px-6 md:px-16 py-20">
+    <div className="max-w-7xl mx-auto">
+
+      <div className="mb-10">
+        <span className="font-mono text-orange-400 text-xs tracking-[0.2em] uppercase">
+          Discover More
+        </span>
+
+        <h2 className="text-4xl font-bold mt-3">
+          Related Events
+        </h2>
+
+        <p className="text-zinc-500 mt-3">
+          Explore similar events you may be interested in.
+        </p>
+      </div>
+
+      <Collection
+        data={relatedEvents?.data}
+        emptyTitle="No Events Found"
+        emptyStateSubtext="Come back later"
+        collectionType="All_Events"
+        limit={3}
+        page={page}
+        totalPages={relatedEvents?.totalPages}
+      />
+    </div>
+  </section>
+
+  <Footer />
+</div>
     </>
   );
-};
-
-// export default EventDetails;
+}

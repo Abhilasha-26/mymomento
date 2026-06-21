@@ -1,13 +1,7 @@
-
 import { IEvent } from '@/lib/database/models/event.model';
 import React from 'react';
 import Card from './Card';
 import Pagination from './Pagination';
-
-//
-import { auth } from '@clerk/nextjs/server';
-
-
 
 type CollectionProps = {
   data: IEvent[];
@@ -19,9 +13,11 @@ type CollectionProps = {
   urlParamName?: string;
   collectionType?: 'Events_Organized' | 'My_Tickets' | 'All_Events';
 
+  // current logged in user's MongoDB _id
+  userId?: string;
 };
 
-const Collection =async({
+const Collection = ({
   data,
   emptyTitle,
   emptyStateSubtext,
@@ -29,13 +25,8 @@ const Collection =async({
   totalPages = 0,
   collectionType,
   urlParamName,
+  userId,
 }: CollectionProps) => {
-  const { userId } = await auth();
-  //added auth,async,await,this userid,added in cards too//
-
-
-
-
   return (
     <>
       {data.length > 0 ? (
@@ -48,24 +39,40 @@ const Collection =async({
               return (
                 <li
                   key={event._id}
-                  className="flex justify-center transition duration-300 transform hover:scale-[1.03] hover:shadow-xl"
+                  className="flex justify-center transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1"
                 >
-                  {/*did a change here  */}
-                  <Card event={event} userId={userId!} hasOrderLink={hasOrderLink} hidePrice={hidePrice}  /> 
+                  <Card
+                    event={event}
+                    userId={userId}
+                    hasOrderLink={hasOrderLink}
+                    hidePrice={hidePrice}
+                  />
                 </li>
               );
             })}
           </ul>
 
           {totalPages > 1 && (
-            <Pagination urlParamName={urlParamName} page={page} totalPages={totalPages} />
+            <Pagination
+              urlParamName={urlParamName}
+              page={page}
+              totalPages={totalPages}
+            />
           )}
         </div>
       ) : (
-        <div className="wrapper w-full min-h-[240px] flex flex-col items-center justify-center gap-4 rounded-xl bg-neutral-900 text-white py-24 shadow-lg text-center">
-          <div className="text-6xl animate-pulse">😕</div>
-          <h3 className="text-2xl font-semibold">{emptyTitle}</h3>
-          <p className="text-base text-gray-400">{emptyStateSubtext}</p>
+        <div className="wrapper w-full min-h-[280px] flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-b from-neutral-900 to-neutral-950 text-white py-24 text-center">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-orange-500/10 mb-2">
+            <span className="text-3xl">🔍</span>
+          </div>
+
+          <h3 className="text-2xl font-bold tracking-tight">
+            {emptyTitle}
+          </h3>
+
+          <p className="text-base text-gray-500 max-w-sm font-light">
+            {emptyStateSubtext}
+          </p>
         </div>
       )}
     </>

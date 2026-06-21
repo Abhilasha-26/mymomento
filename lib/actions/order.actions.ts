@@ -12,32 +12,42 @@ import User from '../database/models/user.model';
 import mongoose from 'mongoose';
 
 export const checkoutOrder = async (order: CheckoutOrderParams) => {
+  console.log("checkoutOrder called with:", order);
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
   const price = order.isFree ? 0 : Number(order.price) * 100;
 
   try {
     const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price_data: {
-            currency: 'inr',
-            unit_amount: price,
-            product_data: {
-              name: order.eventTitle
-            }
-          },
-          quantity: 1
+  line_items: [
+    {
+      price_data: {
+        currency: 'inr',
+        unit_amount: price,
+        product_data: {
+          name: order.eventTitle,
         },
-      ],
-      metadata: {
-        eventId: order.eventId,
-        buyerId: order.buyerId,
       },
-      mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
-    });
+      quantity: 1,
+    },
+  ],
+  mode: 'payment',
+
+  metadata: {
+    eventId: order.eventId,
+    buyerId: order.buyerId,
+  },
+
+  payment_intent_data: {
+    metadata: {
+      eventId: order.eventId,
+      buyerId: order.buyerId,
+    },
+  },
+
+  success_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/profile`,
+  cancel_url: `${process.env.NEXT_PUBLIC_SERVER_URL}/`,
+});
 
     redirect(session.url!)
   } catch (error) {
@@ -48,7 +58,13 @@ export const checkoutOrder = async (order: CheckoutOrderParams) => {
 export const createOrder = async (order: CreateOrderParams) => {
   try {
     await connectToDatabase();
-    
+
+    const existingOrder = await Order.findOne({
+      stripeId: order.stripeId,
+    });
+
+    if (existingOrder) return existingOrder;
+
     const newOrder = await Order.create({
       ...order,
       event: order.eventId,
@@ -59,8 +75,7 @@ export const createOrder = async (order: CreateOrderParams) => {
   } catch (error) {
     handleError(error);
   }
-}
-
+};
 // GET ORDERS BY EVENT
 export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEventParams) {
   try {
@@ -117,32 +132,41 @@ export async function getOrdersByEvent({ searchString, eventId }: GetOrdersByEve
   }
 }
 
+
 // GET ORDERS BY USER
-export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUserParams) {
+export async function getOrdersByUser({
+  userId,
+  limit = 3,
+  page,
+}: GetOrdersByUserParams) {
   try {
     await connectToDatabase();
 
-    // ✅ Validate userId
-    if (!userId || typeof userId !== 'string' || !ObjectId.isValid(userId)) {
-      throw new Error('Invalid userId');
+    if (!userId) {
+      throw new Error("User ID is required");
     }
 
-    const userObjectId = new ObjectId(userId);
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      throw new Error("Invalid User ID");
+    }
+
     const skipAmount = (Number(page) - 1) * limit;
 
-    const conditions = { buyer: userObjectId };
+    const conditions = {
+      buyer: new mongoose.Types.ObjectId(userId),
+    };
 
     const orders = await Order.find(conditions)
-      .sort({ createdAt: 'desc' })
+      .sort({ createdAt: "desc" })
       .skip(skipAmount)
       .limit(limit)
       .populate({
-        path: 'event',
+        path: "event",
         model: Event,
         populate: {
-          path: 'organizer',
+          path: "organizer",
           model: User,
-          select: '_id firstName lastName',
+          select: "_id firstName lastName",
         },
       });
 
@@ -154,6 +178,5 @@ export async function getOrdersByUser({ userId, limit = 3, page }: GetOrdersByUs
     };
   } catch (error) {
     handleError(error);
-    throw error;
   }
 }
