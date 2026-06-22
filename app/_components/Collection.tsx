@@ -38,7 +38,7 @@ const Collection = ({
 
               return (
                 <li
-                  key={event._id}
+                  key={event._id.toString()} 
                   className="flex justify-center transition-all duration-300 transform hover:scale-[1.03] hover:-translate-y-1"
                 >
                   <Card

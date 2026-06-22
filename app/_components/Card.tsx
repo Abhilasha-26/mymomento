@@ -44,7 +44,7 @@ const Card = ({
             />
           </Link>
 
-          <DeleteConfirmation eventId={event._id}  userId={userId!}/>
+          <DeleteConfirmation eventId={event._id.toString()}  userId={userId!}/>
         </div>
       )}
 

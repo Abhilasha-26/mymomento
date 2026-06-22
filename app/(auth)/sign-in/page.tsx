@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -54,7 +55,12 @@ export default function SignInPage() {
 
         {/* Header */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center mb-4" />
+          <Image
+                      src="/assets/icons/logo.png"
+                      alt="Momento Logo"
+                      width={40}
+                      height={40}
+                    />
           <h1 className="text-2xl font-bold text-white">Welcome back</h1>
           <p className="text-zinc-500 text-sm">Sign in to continue</p>
         </div>
